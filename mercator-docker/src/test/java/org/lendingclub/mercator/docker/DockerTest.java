@@ -13,7 +13,7 @@ public class DockerTest {
 		try {
 			BasicProjector p = new BasicProjector();
 			DockerScanner ds = p.createBuilder(DockerScannerBuilder.class).build();
-
+			ds.applyConstraints();
 			ds.scan();
 
 		} catch (Exception e) {

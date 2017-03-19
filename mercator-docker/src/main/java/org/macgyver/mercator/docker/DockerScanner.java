@@ -2,7 +2,6 @@ package org.macgyver.mercator.docker;
 
 import java.util.Map;
 
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.lendingclub.mercator.core.AbstractScanner;
 import org.lendingclub.mercator.core.Scanner;
 import org.lendingclub.mercator.core.ScannerBuilder;
@@ -15,13 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.DockerCmdExecFactory;
+import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Info;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Converter;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
@@ -31,6 +29,9 @@ public class DockerScanner extends AbstractScanner {
 
 	static ObjectMapper mapper = new ObjectMapper();
 
+	static {
+		mapper.registerModule(new DockerSerializerModule());
+	}
 	Supplier<DockerClient> supplier;
 
 	public DockerScanner(ScannerBuilder<? extends Scanner> builder, Map<String, String> props) {
@@ -60,7 +61,7 @@ public class DockerScanner extends AbstractScanner {
 	}
 
 	protected void projectContainer(Container c) {
-		JsonNode n = containerToJson(c);
+		JsonNode n = mapper.valueToTree(c);
 
 		String cypher = "merge (c:DockerContainer {id:{id}}) set c+={props},c.updateTs=timestamp() return c";
 
@@ -78,6 +79,16 @@ public class DockerScanner extends AbstractScanner {
 			it.incrementEntityCount();
 			it.incrementEntityCount();
 		});
+		
+		projectContainerDetail(c);
+	}
+	
+	private void projectContainerDetail(Container c) {
+		InspectContainerResponse icr = getDockerClient().inspectContainerCmd(c.getId()).exec();
+		
+		String cypher = "merge (c:DockerContainer {id:{id}}) set c+={props}";
+		getProjector().getNeoRxClient().execCypher(cypher, "id",c.getId(),"props",mapper.valueToTree(icr));
+		
 	}
 
 	public void scanContainers() {
@@ -97,78 +108,36 @@ public class DockerScanner extends AbstractScanner {
 		});
 	}
 
-	JsonNode containerToJson(Container c) {
-		ObjectNode target = mapper.createObjectNode();
-		ObjectNode auto = (ObjectNode) mapper.convertValue(c, JsonNode.class);
-		Converter<String, String> caseFormat = CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_CAMEL);
+	
 
-		auto.fields().forEachRemaining(it -> {
-
-			String field = caseFormat.convert(it.getKey());
-			if (it.getValue().isContainerNode()) {
-				if (it.getValue().isArray()) {
-
-					if (field.equals("names")) {
-						target.set(field, it.getValue());
-					}
-
-				}
-			}
-
-			else {
-				if (field.equals("imageID")) {
-					field = "imageId";
-				}
-				target.set(field, it.getValue());
-			}
-
-		});
-
-		target.put("running", target.path("status").asText().toLowerCase().startsWith("up"));
-
-		return target;
-	}
-
-	ObjectNode toJson(Info info) {
-		ObjectNode intermediate = (ObjectNode) mapper.convertValue(info, JsonNode.class);
-		ObjectNode target = mapper.createObjectNode();
-		Converter<String, String> caseFormat = CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_CAMEL);
-
-		intermediate.fields().forEachRemaining(it -> {
-
-			if (it.getValue().isContainerNode()) {
-				// discard
-			} else {
-				String key = caseFormat.convert(it.getKey());
-				if (key.startsWith("cPU")) {
-					key = key.replace("cPU", "cpu");
-				} else if (key.equals("imageID")) {
-					key = "imageId";
-				} else if (key.equals("iD")) {
-					key = "id";
-				} else if (key.equalsIgnoreCase("ostype")) {
-					key = "osType";
-				} else if (key.equalsIgnoreCase("ngoroutines")) {
-					key = "nGoRoutines";
-				} else if (key.equalsIgnoreCase("neventsListener")) {
-					key = "nEventsListener";
-				}
-				target.set(key, it.getValue());
-			}
-
-		});
-		return target;
-	}
-
+	
 	public void scanInfo() {
 		Info info = getDockerClient().infoCmd().exec();
 
+		ObjectNode n = (ObjectNode) mapper.valueToTree(info);
+
+		
 	}
+
+	public void scanImages() {
+		getDockerClient().listImagesCmd().exec().forEach(img -> {
+			
+		
+			getProjector().getNeoRxClient().execCypher("merge (x:DockerImage {id:{id}}) set x+={props}", "id",
+					img.getId(), "props", mapper.valueToTree(img));
+		});
+	}
+
 
 	public void scan() {
 		scanInfo();
-
+		scanImages();
 		scanContainers();
 
+	}
+
+	public void applyConstraints() {
+		DockerSchemaManager m = new DockerSchemaManager(getProjector().getNeoRxClient());
+		m.applyConstraints();
 	}
 }

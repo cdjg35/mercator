@@ -11,4 +11,6 @@ public class DockerScannerBuilder extends ScannerBuilder<DockerScanner> {
 		return new DockerScanner(this,getProjector().getProperties());
 	}
 
+	
+	
 }
