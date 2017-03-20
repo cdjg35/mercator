@@ -18,6 +18,7 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Info;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DefaultDockerClientConfig.Builder;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
 import com.google.common.base.Supplier;
@@ -26,7 +27,9 @@ import com.google.common.base.Suppliers;
 public class DockerScanner extends AbstractScanner {
 
 	Logger logger = LoggerFactory.getLogger(DockerScanner.class);
-
+	
+	DockerScannerBuilder dockerScannerBuilder;
+	
 	static ObjectMapper mapper = new ObjectMapper();
 
 	static {
@@ -38,14 +41,22 @@ public class DockerScanner extends AbstractScanner {
 		super(builder, props);
 
 		supplier = Suppliers.memoize(new DockerClientSupplier());
+		this.dockerScannerBuilder = (DockerScannerBuilder) builder;
+		
 	}
 
 	class DockerClientSupplier implements Supplier<DockerClient> {
 		public DockerClient get() {
 			String host = getConfig().getOrDefault("DOCKER_HOST", "unix:///var/run/docker.sock");
-			DefaultDockerClientConfig cc = DefaultDockerClientConfig.createDefaultConfigBuilder().withDockerHost(host)
-					.build();
+			Builder builder = DefaultDockerClientConfig.createDefaultConfigBuilder().withDockerHost(host);
+			
+			
+			DefaultDockerClientConfig cc  =		builder.build();
 
+			if (dockerScannerBuilder.configurator!=null) {
+				dockerScannerBuilder.configurator.accept(builder);
+			}
+			
 			DockerCmdExecFactory dockerCmdExecFactory = new JerseyDockerCmdExecFactory().withReadTimeout(1000)
 					.withConnectTimeout(1000).withMaxTotalConnections(100).withMaxPerRouteConnections(10);
 
