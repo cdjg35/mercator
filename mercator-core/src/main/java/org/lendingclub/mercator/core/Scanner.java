@@ -15,9 +15,12 @@
  */
 package org.lendingclub.mercator.core;
 
+import io.macgyver.neorx.rest.NeoRxClient;
+
 public interface Scanner {
 
 	public void scan();
 	public Projector getProjector();
+	public NeoRxClient getNeoRxClient();
 	public SchemaManager getSchemaManager();
 }
