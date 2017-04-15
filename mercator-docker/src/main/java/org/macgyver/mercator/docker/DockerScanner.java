@@ -15,8 +15,6 @@
  */
 package org.macgyver.mercator.docker;
 
-import java.util.Map;
-
 import org.lendingclub.mercator.core.AbstractScanner;
 import org.lendingclub.mercator.core.Scanner;
 import org.lendingclub.mercator.core.ScannerBuilder;
@@ -162,7 +160,7 @@ public class DockerScanner extends AbstractScanner {
 	public void scanImages() {
 		getDockerClient().listImagesCmd().exec().forEach(img -> {
 			
-		
+
 			// Note that images don't really belong to a cluster.  They are unique across time and space by SHA256 and may be present
 			// anywhere.
 			getProjector().getNeoRxClient().execCypher("merge (x:DockerImage {mercatorId:{id}}) set x+={props}", "id",
