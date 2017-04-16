@@ -34,14 +34,13 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.macgyver.okrest3.OkRestTarget;
 
 public interface NewRelicClient {
 	public static final String ENDPOINT_URL = "https://api.newrelic.com/";
 	public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
 	public static final String APPLICATION_FORM_URLENCODED_VALUE = "application/x-www-form-urlencoded";
 	
-	public OkRestTarget getOkRestTarget();
+	public org.lendingclub.okrest3.OkRestTarget getOkRestTarget();
 	public ObjectNode get(String path, String... args);
 	public ObjectNode getApplications();
 	public ObjectNode getServers();

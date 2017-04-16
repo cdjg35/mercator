@@ -16,9 +16,8 @@
 package org.macgyver.mercator.ucs;
 
 import org.lendingclub.mercator.core.ScannerBuilder;
-
-import io.macgyver.okrest3.OkHttpClientConfigurer;
-import io.macgyver.okrest3.OkRestClientConfigurer;
+import org.lendingclub.okrest3.OkHttpClientConfigurer;
+import org.lendingclub.okrest3.OkRestClientConfigurer;
 
 
 public class UCSScannerBuilder extends ScannerBuilder<UCSScanner> {

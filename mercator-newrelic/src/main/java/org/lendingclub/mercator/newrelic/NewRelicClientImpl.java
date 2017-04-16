@@ -33,25 +33,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lendingclub.okrest3.OkRestClient;
+import org.lendingclub.okrest3.OkRestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import io.macgyver.okrest3.OkRestTarget;
+
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import io.macgyver.okrest3.OkRestClient.Builder;
 
 public class NewRelicClientImpl implements NewRelicClient {
 	
-	private OkRestTarget restTarget;
+	private org.lendingclub.okrest3.OkRestTarget restTarget;
 	private Logger logger = LoggerFactory.getLogger(NewRelicClientImpl.class);
 	private ObjectMapper mapper = new ObjectMapper();
 	private String accountId;
@@ -81,7 +81,7 @@ public class NewRelicClientImpl implements NewRelicClient {
 		
 		this.accountId = accountId;
 		
-		Builder builder = new Builder();
+		OkRestClient.Builder  builder = new OkRestClient.Builder();
 		
 		if(!Strings.isNullOrEmpty(token)) {
 			builder.withOkHttpClientConfig(cfg -> {

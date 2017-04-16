@@ -29,6 +29,11 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.lendingclub.mercator.core.MercatorException;
+import org.lendingclub.okrest3.OkHttpClientConfigurer;
+import org.lendingclub.okrest3.OkRestClient;
+import org.lendingclub.okrest3.OkRestClientConfigurer;
+import org.lendingclub.okrest3.OkRestResponse;
+import org.lendingclub.okrest3.OkRestTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +43,6 @@ import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
-
-import io.macgyver.okrest3.OkHttpClientConfigurer;
-import io.macgyver.okrest3.OkRestClient;
-import io.macgyver.okrest3.OkRestClientConfigurer;
-import io.macgyver.okrest3.OkRestResponse;
-import io.macgyver.okrest3.OkRestTarget;
 
 public class UCSClient {
 

@@ -33,7 +33,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.macgyver.okrest3.OkRestTarget;
+import org.lendingclub.okrest3.OkRestTarget;
 
 public interface JenkinsClient {
 

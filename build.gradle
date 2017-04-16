@@ -52,6 +52,7 @@ subprojects {
     	header rootProject.file('LICENSE')
     	strictCheck true
 	}
+    
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource

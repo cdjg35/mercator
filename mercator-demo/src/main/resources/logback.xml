@@ -27,7 +27,7 @@
     </appender>
 
 
-    <logger name="io.macgyver.neorx">
+    <logger name="org.lendingclub.neorx">
 	    <level value="INFO" />
     </logger>
 

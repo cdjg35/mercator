@@ -21,17 +21,17 @@ import org.lendingclub.mercator.core.BasicProjector;
 import org.lendingclub.mercator.core.Projector;
 
 public class NewRelicScannerTest {
-	
-	
+
 	@Test
 	@Ignore
 	public void test() {
-		
+
 		String accountId = "290";
 		String token = "1234";
-		
-		NewRelicScanner scanner = new Projector.Builder().build().createBuilder(NewRelicScannerBuilder.class).withAccountId(accountId).withToken(token).build();
-		scanner.scan();	
+
+		NewRelicScanner scanner = new Projector.Builder().build().createBuilder(NewRelicScannerBuilder.class)
+				.withAccountId(accountId).withToken(token).build();
+		scanner.scan();
 	}
 
 }

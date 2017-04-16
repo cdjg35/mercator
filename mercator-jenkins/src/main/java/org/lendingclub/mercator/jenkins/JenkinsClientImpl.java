@@ -29,11 +29,11 @@
 package org.lendingclub.mercator.jenkins;
 
 
-import io.macgyver.okrest3.OkRestClient.Builder;
-import io.macgyver.okrest3.OkRestException;
-import io.macgyver.okrest3.OkRestTarget;
-import io.macgyver.okrest3.OkRestWrapperException;
-import io.macgyver.okrest3.compat.OkUriBuilder;
+import org.lendingclub.okrest3.OkRestClient.Builder;
+import org.lendingclub.okrest3.OkRestException;
+import org.lendingclub.okrest3.OkRestTarget;
+import org.lendingclub.okrest3.OkRestWrapperException;
+import org.lendingclub.okrest3.compat.OkUriBuilder;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -69,7 +69,7 @@ public class JenkinsClientImpl implements JenkinsClient {
 
 	Logger logger = LoggerFactory.getLogger(JenkinsClientImpl.class);
 
-	io.macgyver.okrest3.OkRestTarget target;
+	org.lendingclub.okrest3.OkRestTarget target;
 
 	private String urlBase;
 
@@ -78,10 +78,10 @@ public class JenkinsClientImpl implements JenkinsClient {
 		this.urlBase = urlBase;
 
 
-		Builder builder = new io.macgyver.okrest3.OkRestClient.Builder();
+		Builder builder = new org.lendingclub.okrest3.OkRestClient.Builder();
 		if (!Strings.isNullOrEmpty(username)) {
 			builder.withOkHttpClientConfig(cfg -> {
-				cfg.addInterceptor(new io.macgyver.okrest3.BasicAuthInterceptor(username, password));
+				cfg.addInterceptor(new org.lendingclub.okrest3.BasicAuthInterceptor(username, password));
 			});
 		}
 		
@@ -123,7 +123,7 @@ public class JenkinsClientImpl implements JenkinsClient {
 	public org.jdom2.Document getJobConfig(String jobName) {
 
 		try {
-			io.macgyver.okrest3.OkRestResponse rr = target.path("job").path(jobName)
+			org.lendingclub.okrest3.OkRestResponse rr = target.path("job").path(jobName)
 					.path("config.xml").get().execute();
 
 			return new SAXBuilder().build(rr.response().body().byteStream());
